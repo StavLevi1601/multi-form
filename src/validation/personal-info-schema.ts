@@ -9,4 +9,4 @@ export const personalInfoSchema = z.object({
     .max(15, { message: "Phone number must be valid." }),
 });
 
-export type PersonalInfo = z.infer<typeof personalInfoSchema>;
+export type PersonalInfoSchema = z.infer<typeof personalInfoSchema>;
