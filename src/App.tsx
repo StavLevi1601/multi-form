@@ -1,113 +1,109 @@
+import { NextStep } from "./components/next-step";
+import { StepsInfo } from "./components/steps-info";
+import { Header } from "./components/header";
+import { useState } from "react";
+import { PersonalInfoData } from "./register/step-1/personal-info-data";
+import { PlansData } from "./register/step-2/select-plans-data";
+import { GoBack } from "./components/go-back";
+import { PickAddons } from "./register/step-3/pick-add-ons";
+import FinishingUp from "./register/step-4/finishing-up";
+import { PersonalInfoSchema } from "./validation/personal-info-schema";
+import { FieldErrors } from "react-hook-form";
+
+export const headers = [
+  {
+    header: "Personal info",
+    subHeader: "Please provide your name, email address, and phone number.",
+  },
+  {
+    header: "Your plan",
+    subHeader: "Please choose the plan that’s right for you.",
+  },
+  {
+    header: "Pick add-ons",
+    subHeader: "Add-ons help enhance your gaming experience.",
+  },
+  {
+    header: "Finishing up",
+    subHeader: "Double-check everything looks OK before confirming.",
+  },
+];
+
 export default function App() {
-  const personalInfo = [
-    {
-      label: "Name",
-      type: "text",
-      placeholder: "e.g Stephen King",
-    },
-    {
-      label: "Email Address",
-      type: "email",
-      placeholder: "e.g stephenking@lorem.com",
-    },
-    {
-      label: "Phone Number",
-      type: "tel",
-      placeholder: "e.g +1 234 567 890",
-    },
-  ];
+  const [currentStep, setCurrentStep] = useState(1);
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoSchema | null>(
+    null
+  );
+  const [personalInfoErrors, setPersonalInfoErrors] =
+    useState<FieldErrors<PersonalInfoSchema> | null>(null);
 
-  const stepsInfo = [
-    {
-      title: "STEP 1",
-      info: "YOUR INFO",
-      textColor: "text-[#022959]",
-      bgColor: "bg-[#BEE2FD]",
-    },
-    {
-      title: "STEP 2",
-      info: "SELECT PLAN",
-      textColor: "text-white",
-      bgColor: "bg-transparent",
-    },
-    {
-      title: "STEP 3",
-      info: "ADD-ONS",
-      textColor: "text-white",
-      bgColor: "bg-transparent",
-    },
-    {
-      title: "STEP 4",
-      info: "SUMMARY",
-      textColor: "text-white",
-      bgColor: "bg-transparent",
-    },
-  ];
+  const goToNextStep = () => {
+    console.log("personalInfoErrors: ", personalInfoErrors);
+    console.log("personalInfo: ", personalInfo?.name);
 
-  // Reminde to myself:
-  // left with minus sign to move the element to the left
-  // relative - the element will be relative to the parent element,so i put the relative on the parent element
-  // absolute - ממוקם באופן אבסולוטי, במידה
+    if (
+      currentStep === 1 &&
+      personalInfoErrors &&
+      (!personalInfo?.name ||
+        !personalInfo.emailAddress ||
+        !personalInfo.phoneNumber)
+    )
+      return;
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const goToPreviousStep = () => {
+    setCurrentStep((prev) => prev - 1);
+  };
+
+  const handlePersonalInfo = (
+    data: PersonalInfoSchema,
+    errors: FieldErrors<PersonalInfoSchema>
+  ) => {
+    setPersonalInfo(data);
+    setPersonalInfoErrors(errors);
+  };
+
+  const justify = currentStep === 1 ? "justify-end" : "justify-between";
+  const marginTop =
+    currentStep === 1
+      ? "mt-[40px]"
+      : currentStep === 3
+      ? "mt-[45px]"
+      : "mt-[75px]";
 
   return (
-    <div className="h-screen w-screen bg-[#EFF5FF] flex items-center align-middle">
+    <div className="h-screen bg-[#EFF5FF] flex items-center align-middle">
       <div className="w-[940px] h-[600px] m-auto bg-white py-[16px] pl-[16px] rounded-2xl flex flex-row">
         <div className="flex flex-row gap-32">
-          <div className="flex w-[274px] h-[568px] bg-[#483EFF] rounded-2xl overflow-hidden relative">
-            <div className=" bg-[#FFAF7E] rounded-full  w-[134px] h-[134px] absolute left-[-67px] bottom-[37.11px]"></div>
-            <div className="flex flex-col gap-[32px] mt-[40px] ml-[32px]">
-              {stepsInfo.map((step, key) => (
-                <div key={key} className="flex flex-row gap-[16px]">
-                  <div
-                    className={`flex justify-center items-center w-[40px] h-[40px] border-white border-2 rounded-full ${step.textColor} ${step.bgColor}`}
-                  >
-                    {key + 1}
-                  </div>
-                  <div className="flex flex-col gap-[4px]">
-                    <div className="ubuntu-light text-sm text-white">
-                      {step.title}
-                    </div>
-                    <div className="ubuntu-bold text-md text-white">
-                      {step.info}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="flex w-[274px] h-[568px] bg-cover bg-center relative bg-[url('./assets/images/bg-sidebar-desktop.svg')]">
+            <StepsInfo currentStep={currentStep} />
           </div>
 
-          <div className="w-[450px] h-[372px] bg-white  mt-[40px]">
+          <div className="w-[450px] h-[372px] bg-white  pt-[40px]">
             <div className="flex flex-col gap-[35px]">
-              <div className="flex flex-col gap-[11px]">
-                <div className="ubuntu-bold text-3xl flex justify-start">
-                  Personal info
-                </div>
-                <div className="ubuntu text-md flex justify-start text-[#9699AA]">
-                  Please provide your name, email address, and phone number.
-                </div>
-              </div>
-              <div className="flex flex-col gap-[24px]">
-                {personalInfo.map((info, key) => (
-                  <div className="flex flex-col gap-[8px]" key={key}>
-                    <label className="flex text-[#02295]">{info.label}</label>
-                    <input
-                      type={info.type}
-                      placeholder={info.placeholder}
-                      className="flex rounded-md w-[450px] h-[48px] border-2 border-[#D6D9E6] pl-[16px] ubuntu-medium"
+              {headers.map((header, index) => {
+                if (currentStep === index + 1) {
+                  return (
+                    <Header
+                      header={header.header}
+                      subHeader={header.subHeader}
                     />
-                  </div>
-                ))}
+                  );
+                }
+              })}
+              {currentStep === 1 && (
+                <PersonalInfoData onData={handlePersonalInfo} />
+              )}
+              {currentStep === 2 && <PlansData />}
+              {currentStep === 3 && <PickAddons />}
+              {currentStep === 4 && <FinishingUp />}
+              <div
+                className={`flex ${justify} items-center h-[48px] w-[450px] ${marginTop} ml-[5px]`}
+              >
+                {currentStep !== 1 && <GoBack onClick={goToPreviousStep} />}
+                <NextStep onClick={goToNextStep} />
               </div>
-            </div>
-
-            <div className="w-[123px] h-[48px] bg-[#022959] mt-[70px] ml-[325px] rounded-lg flex justify-center items-center ">
-              <button>
-                <div className="flex justify-center items-center h-full">
-                  <div className="ubuntu text-lg text-white flex justify-center items-center m-auto">
-                    Next Step
-                  </div>
-                </div>
-              </button>
             </div>
           </div>
         </div>
